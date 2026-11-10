@@ -45,9 +45,9 @@ the missing parts during the class.
 | Branch | Holds |
 | --- | --- |
 | `main` | The starter. Begin every exercise from here, or from your own previous exercise. |
-| `kunci/m02-health-service` | Answer key for Module 2, "Latihan Satu Putaran Pertama". |
-| `kunci/m04-call-next` | Answer key for Module 4, "Latihan Satu Putaran AIM di Antre". |
-| `kunci/m06-buru-mutan` | Answer key for Module 6, "Latihan Buru Mutan di Antre". |
+| `kunci/health-service` | Answer key for "Latihan Satu Putaran Pertama". |
+| `kunci/call-next` | Answer key for "Latihan Satu Putaran AIM di Antre". |
+| `kunci/buru-mutan` | Answer key for "Latihan Buru Mutan di Antre". |
 
 Each answer branch builds on the one before it and carries a `KUNCI.md` that explains what changed,
 why, and how to check it. Read an answer only after your own attempt. An answer key shows one way
@@ -55,7 +55,7 @@ that passes the checks, and yours may differ and still be right.
 
 ```sh
 git fetch origin
-git diff main origin/kunci/m02-health-service
+git diff main origin/kunci/health-service
 ```
 
 ## Licence
