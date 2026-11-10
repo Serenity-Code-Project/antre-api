@@ -5,6 +5,13 @@
     "version": "0.1.0"
   },
   "components": {
+    "securitySchemes": {
+      "staffKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-staff-key"
+      }
+    },
     "schemas": {
       "Ticket": {
         "type": "object",
@@ -65,6 +72,17 @@
           "current",
           "waiting",
           "next"
+        ]
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "error"
         ]
       }
     },
@@ -127,6 +145,48 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/QueueState"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/call-next": {
+      "post": {
+        "operationId": "callNext",
+        "security": [
+          {
+            "staffKey": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The ticket that is now on the board",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ticket"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The staff key is missing or wrong",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Nobody is waiting",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
                 }
               }
             }

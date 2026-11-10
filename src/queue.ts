@@ -67,6 +67,19 @@ export function takeNumber(db: Database, now = new Date()): Ticket {
   return toTicket(row);
 }
 
+/** Calls the smallest waiting number of the day. Returns null when nobody is waiting.
+ *  One statement picks and marks the ticket, so two calls can never take the same number. */
+export function callNext(db: Database, now = new Date()): Ticket | null {
+  const row = db
+    .query<TicketRow, [string]>(
+      `update tickets set status = 'called'
+       where id = (select id from tickets where day = ? and status = 'waiting' order by number limit 1)
+       returning *`,
+    )
+    .get(dayOf(now));
+  return row ? toTicket(row) : null;
+}
+
 /** What the display board shows for the day. */
 export function readState(db: Database, now = new Date()): QueueState {
   const day = dayOf(now);
