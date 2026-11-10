@@ -4,10 +4,11 @@ import { createApp } from './app.ts';
 import { callNext, openQueue, readState, takeNumber } from './queue.ts';
 
 describe('takeNumber', () => {
-  test('gives out a ticket', () => {
+  test('gives out number 1 as the first ticket, waiting', () => {
     const db = openQueue();
-    const ticket = takeNumber(db);
-    expect(ticket).toBeTruthy();
+    const noon = new Date('2026-03-02T05:00:00.000Z');
+    const ticket = takeNumber(db, noon);
+    expect(ticket).toMatchObject({ number: 1, day: '2026-03-02', status: 'waiting' });
   });
 
   test('counts up within a day', () => {
@@ -25,6 +26,17 @@ describe('readState', () => {
     takeNumber(db, noon);
     takeNumber(db, noon);
     expect(readState(db, noon)).toEqual({ day: '2026-03-02', current: null, waiting: 2, next: [1, 2] });
+  });
+});
+
+describe('readState with a long queue', () => {
+  test('shows at most five next numbers and still counts everyone', () => {
+    const db = openQueue();
+    const noon = new Date('2026-03-02T05:00:00.000Z');
+    for (let i = 0; i < 7; i++) takeNumber(db, noon);
+    const state = readState(db, noon);
+    expect(state.next).toEqual([1, 2, 3, 4, 5]);
+    expect(state.waiting).toBe(7);
   });
 });
 
