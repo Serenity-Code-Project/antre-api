@@ -1,0 +1,135 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Antre API",
+    "version": "0.1.0"
+  },
+  "components": {
+    "schemas": {
+      "Ticket": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "number": {
+            "type": "integer"
+          },
+          "day": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "waiting",
+              "called"
+            ]
+          },
+          "createdAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "number",
+          "day",
+          "status",
+          "createdAt"
+        ]
+      },
+      "QueueState": {
+        "type": "object",
+        "properties": {
+          "day": {
+            "type": "string"
+          },
+          "current": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "waiting": {
+            "type": "integer"
+          },
+          "next": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "maxItems": 5
+          }
+        },
+        "required": [
+          "day",
+          "current",
+          "waiting",
+          "next"
+        ]
+      }
+    },
+    "parameters": {}
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "operationId": "getHealth",
+        "responses": {
+          "200": {
+            "description": "The service is up",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "ok"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tickets": {
+      "post": {
+        "operationId": "takeNumber",
+        "responses": {
+          "201": {
+            "description": "The ticket given to the visitor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ticket"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/state": {
+      "get": {
+        "operationId": "readState",
+        "responses": {
+          "200": {
+            "description": "What the display board shows",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QueueState"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "webhooks": {}
+}
