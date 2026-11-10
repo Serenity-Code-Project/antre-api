@@ -34,4 +34,11 @@ describe('http', () => {
     const response = await app.request('/tickets', { method: 'POST' });
     expect(response.status).toBe(201);
   });
+
+  test('GET /health names the service', async () => {
+    const app = createApp(openQueue(), 'http://localhost:3000');
+    const response = await app.request('/health');
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({ ok: true, service: 'antre-api' });
+  });
 });

@@ -28,7 +28,7 @@ const healthRoute = createRoute({
   path: '/health',
   operationId: 'getHealth',
   responses: {
-    200: { description: 'The service is up', content: { 'application/json': { schema: z.object({ ok: z.boolean() }) } } },
+    200: { description: 'The service is up', content: { 'application/json': { schema: z.object({ ok: z.boolean(), service: z.string() }) } } },
   },
 });
 
@@ -58,7 +58,7 @@ export function createApp(db: Database, webOrigin: string): OpenAPIHono {
   const app = new OpenAPIHono();
   app.use('*', cors({ origin: webOrigin }));
 
-  app.openapi(healthRoute, (c) => c.json({ ok: true }, 200));
+  app.openapi(healthRoute, (c) => c.json({ ok: true, service: 'antre-api' }, 200));
   app.openapi(takeNumberRoute, (c) => c.json(takeNumber(db), 201));
   app.openapi(readStateRoute, (c) => c.json(readState(db), 200));
   app.doc31('/openapi.json', SPEC_INFO);

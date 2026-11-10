@@ -84,10 +84,14 @@
                   "properties": {
                     "ok": {
                       "type": "boolean"
+                    },
+                    "service": {
+                      "type": "string"
                     }
                   },
                   "required": [
-                    "ok"
+                    "ok",
+                    "service"
                   ]
                 }
               }
