@@ -1,5 +1,7 @@
-// .claude/hooks/guard.ts
-// PreToolUse(Bash). Reads one tool call from stdin, refuses with exit 2.
+/**
+ * .claude/hooks/guard.ts
+ * PreToolUse(Bash). Reads one tool call from stdin, refuses with exit 2.
+ */
 const RULES: [RegExp, string][] = [
   [/\brm\b(?=.*\s-\w*r)(?=.*\s-\w*f)/, "recursive delete. Delete files one by one, by name."],
   [/\bgit\s+push\b.*[\s:](main|master)\b/, "push to the main branch. Push a work branch, then open a pull request."],
