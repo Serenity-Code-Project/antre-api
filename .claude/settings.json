@@ -1,0 +1,38 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(bun test:*)",
+      "Bash(bun run type-check:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)"
+    ],
+    "ask": [
+      "Bash(git push:*)",
+      "Bash(bun add:*)",
+      "Edit(.claude/**)",
+      "Edit(scripts/check/guard-probes.*)"
+    ],
+    "deny": [
+      "Bash(rm -rf:*)",
+      "Bash(git push origin main:*)",
+      "Read(.env)",
+      "Read(.env.local)",
+      "Edit(.env*)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard.ts\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

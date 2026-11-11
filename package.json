@@ -8,7 +8,8 @@
     "start": "bun run src/index.ts",
     "test": "bun test",
     "type-check": "tsc --noEmit",
-    "spec:export": "bun run scripts/export-spec.ts"
+    "spec:export": "bun run scripts/export-spec.ts",
+    "check:guard": "bun scripts/check/guard-probes.ts"
   },
   "dependencies": {
     "@hono/zod-openapi": "1.6.3",

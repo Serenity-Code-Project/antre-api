@@ -96,3 +96,47 @@ curl -i -X POST -H "x-staff-key: kunci-coba" localhost:4000/call-next  # 200
   huruf yang sudah benar.
 - Pergantian hari tidak diperbaiki di sini. Spec menuliskannya di bagian yang sengaja tidak
   dikerjakan, lengkap dengan usulan. Itu berbeda dengan tidak sadar bahwa masalahnya ada.
+
+## Latihan Cari Celah dan Pasang Guardrail di Antre
+
+Branch `kunci/guardrails`, dibangun di atas `kunci/call-next`.
+
+Tugasnya mencari celah guardrail di antre-api, memasang tiga daftar izin dan satu hook, lalu
+membuktikan penolakannya dari dua arah. Kode aplikasi di folder `src` tidak berubah.
+
+### Yang Berubah
+
+| File | Perubahan |
+| --- | --- |
+| `.claude/settings.json` | Daftar allow, ask, dan deny, serta sambungan hook untuk tool Bash. |
+| `.claude/hooks/guard.ts` | Hook 26 baris dengan lima aturan. Tool call yang tidak terbaca ikut ditolak. |
+| `scripts/check/guard-probes.tsv` | Enam belas probe, sembilan harus ditolak dan tujuh harus lolos. |
+| `scripts/check/guard-probes.ts` | Mengirim tiap probe ke hook lewat stdin dan menilai exit code-nya. |
+| `package.json` | Script `check:guard`. |
+| `.env.example` | Tiga nama variabel dengan nilai bawaannya. Tidak ada yang rahasia. |
+| `GUARDRAILS.md` | Tujuh celah, penolakan yang terbukti, dan hal yang tidak dicegah. |
+
+### Cara Memeriksa
+
+```sh
+bun run check:guard   # 16 probes, 0 failed
+bun test              # 14 pass, 0 fail
+bun run type-check
+git diff origin/kunci/call-next origin/kunci/guardrails --stat
+```
+
+Perintah terakhir tidak boleh menampilkan file di dalam `src`.
+
+### Yang Perlu Diperhatikan
+
+- Probe menguji dua arah. Sembilan baris `block` membuktikan hook menolak. Tujuh baris `allow`
+  membuktikan hook tidak menghalangi pekerjaan sah, misalnya `cat .env.example` dan
+  `git log --oneline main`.
+- Pola push ke branch utama memakai `[\s:](main|master)`, supaya `git push origin HEAD:main`
+  ikut ditolak. Pola yang hanya mencari spasi sebelum `main` meloloskannya.
+- Pola hapus rekursif mencari huruf `r` dan `f` di flag mana pun, jadi `rm -fr` dan `rm -r -f`
+  ikut tertangkap. Aturan deny berbentuk awalan hanya mengenali `rm -rf`.
+- Skrip probe diakhiri `export {}`. Tanpa baris itu `bun run type-check` gagal, karena `await` di
+  tingkat atas hanya boleh ada di file modul.
+- `GUARDRAILS.md` menulis dua penolakan sebagai terukur lewat probe saja. Itu contoh menulis batas
+  bukti dengan jujur, dan catatanmu sendiri seharusnya memuat hasil dari sesi sungguhan.

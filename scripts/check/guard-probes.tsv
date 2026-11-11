@@ -1,0 +1,16 @@
+block	rm -rf try-delete
+block	rm -fr try-delete
+block	rm -r -f src
+block	git push origin main
+block	git push --force origin feat/call-next
+block	cat .env
+block	grep KEY .env.local
+block	git commit --no-verify -m "quick"
+allow	bun test
+allow	rm try-delete/notes.txt
+allow	git push origin feat/call-next
+allow	git log --oneline main
+allow	cat .env.example
+allow	git commit -m "feat: call the next number"
+block	git push origin HEAD:main
+allow	git push origin feat/main-menu
