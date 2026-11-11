@@ -8,7 +8,7 @@ satu latihan ke latihan berikutnya.
 
 ## Latihan Satu Putaran Pertama
 
-Branch `kunci/health-service`.
+Branch `answer/health-service`.
 
 Tugasnya menambah field `service` berisi `antre-api` ke jawaban `GET /health`.
 
