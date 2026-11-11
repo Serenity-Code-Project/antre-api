@@ -8,7 +8,7 @@ satu latihan ke latihan berikutnya.
 
 ## Latihan Satu Putaran Pertama
 
-Branch `kunci/health-service`.
+Branch `answer/health-service`.
 
 Tugasnya menambah field `service` berisi `antre-api` ke jawaban `GET /health`.
 
@@ -42,7 +42,7 @@ git diff main --stat
 
 ## Latihan Satu Putaran AIM di Antre
 
-Branch `kunci/call-next`.
+Branch `answer/call-next`.
 
 Tugasnya menulis spec untuk fitur memanggil nomor berikutnya, menyerahkannya ke agen dengan tugas
 yang berbatas, lalu mengisi tabel bukti untuk tiap tanda selesai.
@@ -99,7 +99,7 @@ curl -i -X POST -H "x-staff-key: kunci-coba" localhost:4000/call-next  # 200
 
 ## Latihan Buru Mutan di Antre
 
-Branch `kunci/buru-mutan`.
+Branch `answer/hunt-mutant`.
 
 Tugasnya memutasi satu baris dengan tangan, menjalankan Stryker pada `src/queue.ts`, lalu menulis
 tes yang membunuh mutan yang selamat.
