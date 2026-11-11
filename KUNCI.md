@@ -8,7 +8,7 @@ satu latihan ke latihan berikutnya.
 
 ## Latihan Satu Putaran Pertama
 
-Branch `kunci/health-service`.
+Branch `answer/health-service`.
 
 Tugasnya menambah field `service` berisi `antre-api` ke jawaban `GET /health`.
 
@@ -42,7 +42,7 @@ git diff main --stat
 
 ## Latihan Satu Putaran AIM di Antre
 
-Branch `kunci/call-next`.
+Branch `answer/call-next`.
 
 Tugasnya menulis spec untuk fitur memanggil nomor berikutnya, menyerahkannya ke agen dengan tugas
 yang berbatas, lalu mengisi tabel bukti untuk tiap tanda selesai.
@@ -99,7 +99,7 @@ curl -i -X POST -H "x-staff-key: kunci-coba" localhost:4000/call-next  # 200
 
 ## Latihan Cari Celah dan Pasang Guardrail di Antre
 
-Branch `kunci/guardrails`, dibangun di atas `kunci/call-next`.
+Branch `answer/guardrails`, dibangun di atas `answer/call-next`.
 
 Tugasnya mencari celah guardrail di antre-api, memasang tiga daftar izin dan satu hook, lalu
 membuktikan penolakannya dari dua arah. Kode aplikasi di folder `src` tidak berubah.
@@ -122,7 +122,7 @@ membuktikan penolakannya dari dua arah. Kode aplikasi di folder `src` tidak beru
 bun run check:guard   # 16 probes, 0 failed
 bun test              # 14 pass, 0 fail
 bun run type-check
-git diff origin/kunci/call-next origin/kunci/guardrails --stat
+git diff origin/answer/call-next origin/answer/guardrails --stat
 ```
 
 Perintah terakhir tidak boleh menampilkan file di dalam `src`.
