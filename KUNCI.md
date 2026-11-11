@@ -8,7 +8,7 @@ satu latihan ke latihan berikutnya.
 
 ## Latihan Satu Putaran Pertama
 
-Branch `kunci/health-service`.
+Branch `answer/health-service`.
 
 Tugasnya menambah field `service` berisi `antre-api` ke jawaban `GET /health`.
 
@@ -42,7 +42,7 @@ git diff main --stat
 
 ## Latihan Satu Putaran AIM di Antre
 
-Branch `kunci/call-next`.
+Branch `answer/call-next`.
 
 Tugasnya menulis spec untuk fitur memanggil nomor berikutnya, menyerahkannya ke agen dengan tugas
 yang berbatas, lalu mengisi tabel bukti untuk tiap tanda selesai.
