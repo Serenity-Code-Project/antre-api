@@ -47,6 +47,8 @@ the missing parts during the class.
 | `main` | The starter. Begin every exercise from here, or from your own previous exercise. |
 | `answer/health-service` | Answer key for "Latihan Satu Putaran Pertama". |
 | `answer/call-next` | Answer key for "Latihan Satu Putaran AIM di Antre". |
+| `review/staff-stats` | The pull request reviewed in "Latihan Review Pull Request di Antre". |
+| `answer/staff-stats` | Answer key for "Latihan Review Pull Request di Antre". |
 | `answer/hunt-mutant` | Answer key for "Latihan Buru Mutan di Antre". |
 | `answer/guardrails` | Answer key for "Latihan Cari Celah dan Pasang Guardrail di Antre". |
 

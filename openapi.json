@@ -84,6 +84,29 @@
         "required": [
           "error"
         ]
+      },
+      "QueueStats": {
+        "type": "object",
+        "properties": {
+          "day": {
+            "type": "string"
+          },
+          "taken": {
+            "type": "integer"
+          },
+          "called": {
+            "type": "integer"
+          },
+          "waiting": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "day",
+          "taken",
+          "called",
+          "waiting"
+        ]
       }
     },
     "parameters": {}
@@ -197,19 +220,28 @@
     "/stats": {
       "get": {
         "operationId": "readStats",
+        "security": [
+          {
+            "staffKey": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Today's counts",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "day": { "type": "string" },
-                    "taken": { "type": "integer" },
-                    "called": { "type": "integer" },
-                    "waiting": { "type": "integer" }
-                  }
+                  "$ref": "#/components/schemas/QueueStats"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The staff key is missing or wrong",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
                 }
               }
             }

@@ -10,9 +10,12 @@ describe('readStats', () => {
   });
   test('counts taken, called and waiting', () => {
     const db = openQueue();
-    takeNumber(db);
-    callNext(db);
-    expect(readStats(db)).toBeTruthy();
+    const noon = new Date('2026-03-02T05:00:00.000Z');
+    takeNumber(db, noon);
+    takeNumber(db, noon);
+    takeNumber(db, noon);
+    callNext(db, noon);
+    expect(readStats(db, noon)).toEqual({ day: '2026-03-02', taken: 3, called: 1, waiting: 2 });
   });
 });
 
@@ -24,9 +27,25 @@ describe('GET /stats', () => {
     expect(res.status).toBe(401);
   });
 
+  test('answers 401 with a wrong staff key', async () => {
+    const res = await app().request('/stats', { headers: { 'x-staff-key': 'wrong-key' } });
+    expect(res.status).toBe(401);
+  });
+
+  test('answers 401 for every key when no staff key is configured', async () => {
+    const res = await createApp(openQueue(), 'http://localhost:3000').request('/stats', { headers: { 'x-staff-key': '' } });
+    expect(res.status).toBe(401);
+  });
+
+  test('refuses the old development key when no staff key is configured', async () => {
+    const res = await createApp(openQueue(), 'http://localhost:3000').request('/stats', { headers: { 'x-staff-key': 'antre-dev-key' } });
+    expect(res.status).toBe(401);
+  });
+
   test('answers 200 with the right key', async () => {
     const res = await app().request('/stats', { headers: { 'x-staff-key': 'test-key' } });
     expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ day: dayOf(new Date()), taken: 0, called: 0, waiting: 0 });
   });
 });
 

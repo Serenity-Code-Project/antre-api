@@ -96,3 +96,62 @@ curl -i -X POST -H "x-staff-key: kunci-coba" localhost:4000/call-next  # 200
   huruf yang sudah benar.
 - Pergantian hari tidak diperbaiki di sini. Spec menuliskannya di bagian yang sengaja tidak
   dikerjakan, lengkap dengan usulan. Itu berbeda dengan tidak sadar bahwa masalahnya ada.
+
+## Latihan Review Pull Request di Antre
+
+Branch `answer/staff-stats`, dibangun di atas `review/staff-stats`, yaitu pull request yang direview.
+
+Pull request itu lolos `bun test` dan type-check, tetapi tidak boleh digabung. Kunci ini memuat
+tujuh finding yang benar beserta perbaikannya, lalu lima umpan beserta putusannya. Daftar finding-mu
+boleh lebih panjang.
+
+### Tujuh Finding yang Benar
+
+| # | Finding | File dan Baris di Pull Request | Perbaikan | Bukti |
+| --- | --- | --- | --- | --- |
+| 1 | Staff key `antre-dev-key` tertulis di kode dan menjadi nilai bawaan saat `STAFF_KEY` kosong. Ia membuka `GET /stats` dan juga `POST /call-next` yang sudah ada | `src/app.ts:59`, `src/app.ts:105` | Konstanta dihapus, `staffKey` kembali opsional | Measured, curl di bawah |
+| 2 | Papan berubah dari lima menjadi tiga nomor berikutnya, padahal spec melarang perubahan pada papan | `src/queue.ts:96` | `slice(0, 5)` dikembalikan | Measured, `/state` di bawah |
+| 3 | `/stats` di `openapi.json` diketik dengan tangan, tanpa staff key dan tanpa jawaban 401 | `openapi.json:197` | Dibuat ulang dengan `bun run spec:export` | Measured, 46 baris berubah |
+| 4 | Satu-satunya tes `readStats` yang berisi data hanya memeriksa `toBeTruthy()`, jadi done criteria 5 tanpa bukti | `src/queue.test.ts:15` | `toEqual` dengan angka yang dihitung sendiri | Measured, mutan di bawah |
+| 5 | Tidak ada tes 401 untuk staff key salah dan untuk server tanpa `STAFF_KEY` | `src/queue.test.ts` | Tiga tes baru, termasuk staff key lama | Measured, 21 pass |
+| 6 | Tes 200 hanya memeriksa status, tidak pernah isinya | `src/queue.test.ts:29` | Tes memeriksa isi jawaban | Measured, 21 pass |
+| 7 | Komentar di `src/index.ts` masih benar di kode lama, tetapi salah di pull request | `src/index.ts:8` | Komentar menyebut kedua rute staff | Inferred, dibaca dari kode |
+
+### Lima Umpan
+
+| Sumber | Finding | Putusan | Alasan |
+| --- | --- | --- | --- |
+| AI review 1 | SQL dibangun dari string, jadi bisa disuntik lewat `day` | Salah | `src/queue.ts:112` memakai `?`, dan `day` dikirim sebagai parameter |
+| AI review 2 | Kunci salah seharusnya 403, bukan 401 | Salah | Done criteria 1 sampai 3 meminta 401, sama dengan `POST /call-next` |
+| AI review 3 | `sum(status = 'called')` bukan SQL yang sah | Salah | SQLite menjalankannya, dan tes `counts taken, called and waiting` menghitung 1 |
+| AI review 4 | `dayOf` memotong hari dari UTC, jadi sebelum 07.00 WIB masih terhitung kemarin | Benar, tetapi Ditunda | Benar, dan sudah tertulis di bagian Not in this round. Perbaikannya mengubah semua rute |
+| Reviewer 8 | Spec datang di pull request yang sama, jadi tidak direview terpisah | Salah | Di kelas ini spec memang ikut pull request fiturnya, seperti `SPEC.md` di `answer/call-next` |
+
+AI review 5, yaitu `toBeTruthy()` yang lemah, adalah satu-satunya finding AI review yang benar dan
+dikerjakan sekarang. Ia sama dengan finding 4.
+
+### Cara Memeriksa
+
+```sh
+bun test            # 21 pass, 0 fail
+bun run type-check  # tidak mencetak kesalahan
+
+bun run dev         # tanpa STAFF_KEY
+curl -i -H "x-staff-key: antre-dev-key" localhost:4000/stats            # HTTP/1.1 401 Unauthorized
+curl -i -X POST -H "x-staff-key: antre-dev-key" localhost:4000/call-next # HTTP/1.1 401 Unauthorized
+for i in 1 2 3 4 5; do curl -s -X POST localhost:4000/tickets > /dev/null; done
+curl -s localhost:4000/state                                            # "next":[1,2,3,4,5]
+```
+
+Untuk finding 4, rusak kodenya lagi seperti di latihan. Ubah `waiting: taken - called` menjadi
+`waiting: taken` di `src/queue.ts`, lalu jalankan `bun test`. Sekarang hasilnya 20 pass dan 1 fail,
+dengan tes `counts taken, called and waiting` yang gagal. Kembalikan baris itu sesudahnya.
+
+### Yang Perlu Diperhatikan
+
+- Gate hijau hanya membuktikan hal yang diuji. Tes lama tidak menyentuh papan, jadi perubahan
+  papan lolos. Tes baru `toBeTruthy()` tidak bisa gagal, jadi pengurangan yang hilang juga lolos.
+- Finding 1 lebih berat daripada kelihatannya. Nilai bawaan itu juga membuka `POST /call-next`,
+  rute yang aman sebelum pull request ini. Bukti measured-nya adalah jawaban 409, karena 409 berarti
+  staff key diterima.
+- Tiga umpan ditolak dengan menunjuk file dan baris. Menolak finding dengan bukti juga hasil review.

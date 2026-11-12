@@ -55,9 +55,6 @@ const readStateRoute = createRoute({
 
 const ErrorSchema = z.object({ error: z.string() }).openapi('Error');
 
-/* Lets the staff routes work in local development without setting STAFF_KEY. */
-const DEV_STAFF_KEY = 'antre-dev-key';
-
 /* Staff call the next number. The key travels in a header and is never part of the code. */
 const callNextRoute = createRoute({
   method: 'post',
@@ -102,7 +99,7 @@ function isStaff(given: string | undefined, staffKey: string | undefined): boole
 
 export const SPEC_INFO = { openapi: '3.1.0', info: { title: 'Antre API', version: '0.1.0' } };
 
-export function createApp(db: Database, webOrigin: string, staffKey: string = DEV_STAFF_KEY): OpenAPIHono {
+export function createApp(db: Database, webOrigin: string, staffKey?: string): OpenAPIHono {
   const app = new OpenAPIHono();
   app.use('*', cors({ origin: webOrigin }));
 

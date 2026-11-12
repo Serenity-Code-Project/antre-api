@@ -93,7 +93,7 @@ export function readState(db: Database, now = new Date()): QueueState {
     day,
     current: current?.n ?? null,
     waiting: waiting.length,
-    next: waiting.slice(0, 3).map((row) => row.number),
+    next: waiting.slice(0, 5).map((row) => row.number),
   };
 }
 
