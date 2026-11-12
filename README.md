@@ -36,8 +36,8 @@ Settings come from the environment and all have defaults: `PORT` (4000), `WEB_OR
 `src/app.ts`. After changing a route, run `bun run spec:export` and commit the result. Do not edit
 the file by hand. The running service also serves it at `/openapi.json`.
 
-The `/docs` page loads its script from a CDN without a pinned version, so its look can change while
-this repo does not.
+The `/docs` page loads its script from a CDN, pinned to `@scalar/api-reference@1.78.0` in
+`src/app.ts`. Raise that version together with `@scalar/hono-api-reference`.
 
 ## What is missing
 

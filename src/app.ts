@@ -63,8 +63,9 @@ export function createApp(db: Database, webOrigin: string): OpenAPIHono {
   app.openapi(takeNumberRoute, (c) => c.json(takeNumber(db), 201));
   app.openapi(readStateRoute, (c) => c.json(readState(db), 200));
   app.doc31('/openapi.json', SPEC_INFO);
-  /* The reference page is not part of the API, so it is a plain route and stays out of the spec. */
-  app.get('/docs', Scalar({ url: '/openapi.json' }));
+  /* The reference page is not part of the API, so it is a plain route and stays out of the spec.
+     The browser script is pinned too, to the @scalar/api-reference release that shipped with 0.12.19. */
+  app.get('/docs', Scalar({ url: '/openapi.json', cdn: 'https://cdn.jsdelivr.net/npm/@scalar/api-reference@1.78.0' }));
 
   return app;
 }
