@@ -1,6 +1,7 @@
 import type { Database } from 'bun:sqlite';
 import { OpenAPIHono, createRoute, z } from '@hono/zod-openapi';
 import { cors } from 'hono/cors';
+import { requestId } from 'hono/request-id';
 
 import { readState, takeNumber } from './queue.ts';
 
@@ -56,6 +57,22 @@ export const SPEC_INFO = { openapi: '3.1.0', info: { title: 'Antre API', version
 
 export function createApp(db: Database, webOrigin: string): OpenAPIHono {
   const app = new OpenAPIHono();
+  /* Every request gets an id, or keeps the X-Request-Id the client sent, and the id goes back in the response header. */
+  app.use('*', requestId());
+  /* One JSON line per request. Never the body, and no header except the request id. */
+  app.use('*', async (c, next) => {
+    const start = performance.now();
+    await next();
+    console.log(
+      JSON.stringify({
+        requestId: c.get('requestId'),
+        method: c.req.method,
+        path: c.req.path,
+        status: c.res.status,
+        ms: Math.round(performance.now() - start),
+      }),
+    );
+  });
   app.use('*', cors({ origin: webOrigin }));
 
   app.openapi(healthRoute, (c) => c.json({ ok: true }, 200));

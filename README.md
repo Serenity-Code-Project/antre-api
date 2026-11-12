@@ -22,6 +22,10 @@ bun run type-check
 Settings come from the environment and all have defaults: `PORT` (4000), `WEB_ORIGIN`
 (`http://localhost:3000`, the only origin the browser may call from) and `DB_PATH` (`antre.sqlite`).
 
+Every response carries an `X-Request-Id` header. A request that sends one keeps it. The service
+writes one JSON line per request to stdout: `requestId`, `method`, `path`, `status` and `ms`, never
+the body.
+
 ## What works
 
 | Route | Does |
@@ -49,6 +53,7 @@ the missing parts during the class.
 | `answer/call-next` | Answer key for "Latihan Satu Putaran AIM di Antre". |
 | `answer/hunt-mutant` | Answer key for "Latihan Buru Mutan di Antre". |
 | `answer/guardrails` | Answer key for "Latihan Cari Celah dan Pasang Guardrail di Antre". |
+| `answer/request-id` | Answer key for "Latihan Request Id dan Uptime Check di Antre". |
 
 Each answer branch builds on the one before it and carries a `KUNCI.md` that explains what changed,
 why, and how to check it. Read an answer only after your own attempt. An answer key shows one way
