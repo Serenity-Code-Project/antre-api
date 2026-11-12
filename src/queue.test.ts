@@ -1,7 +1,34 @@
 import { describe, expect, test } from 'bun:test';
 
 import { createApp } from './app.ts';
-import { callNext, openQueue, readState, takeNumber } from './queue.ts';
+import { callNext, dayOf, openQueue, readState, readStats, takeNumber } from './queue.ts';
+
+describe('readStats', () => {
+  test('counts nothing on an empty day', () => {
+    const db = openQueue();
+    expect(readStats(db)).toEqual({ day: dayOf(new Date()), taken: 0, called: 0, waiting: 0 });
+  });
+  test('counts taken, called and waiting', () => {
+    const db = openQueue();
+    takeNumber(db);
+    callNext(db);
+    expect(readStats(db)).toBeTruthy();
+  });
+});
+
+describe('GET /stats', () => {
+  const app = () => createApp(openQueue(), 'http://localhost:3000', 'test-key');
+
+  test('answers 401 without a staff key', async () => {
+    const res = await app().request('/stats');
+    expect(res.status).toBe(401);
+  });
+
+  test('answers 200 with the right key', async () => {
+    const res = await app().request('/stats', { headers: { 'x-staff-key': 'test-key' } });
+    expect(res.status).toBe(200);
+  });
+});
 
 describe('takeNumber', () => {
   test('gives out a ticket', () => {

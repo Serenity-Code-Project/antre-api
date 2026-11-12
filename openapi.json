@@ -193,6 +193,29 @@
           }
         }
       }
+    },
+    "/stats": {
+      "get": {
+        "operationId": "readStats",
+        "responses": {
+          "200": {
+            "description": "Today's counts",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "day": { "type": "string" },
+                    "taken": { "type": "integer" },
+                    "called": { "type": "integer" },
+                    "waiting": { "type": "integer" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "webhooks": {}

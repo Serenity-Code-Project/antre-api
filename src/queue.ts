@@ -93,6 +93,26 @@ export function readState(db: Database, now = new Date()): QueueState {
     day,
     current: current?.n ?? null,
     waiting: waiting.length,
-    next: waiting.slice(0, 5).map((row) => row.number),
+    next: waiting.slice(0, 3).map((row) => row.number),
   };
+}
+
+export interface QueueStats {
+  day: string;
+  taken: number;
+  called: number;
+  waiting: number;
+}
+
+/** Today's counts for staff: how many numbers were taken, called and are still waiting. */
+export function readStats(db: Database, now = new Date()): QueueStats {
+  const day = dayOf(now);
+  const row = db
+    .query<{ taken: number; called: number | null }, [string]>(
+      "select count(*) as taken, sum(status = 'called') as called from tickets where day = ?",
+    )
+    .get(day);
+  const taken = row?.taken ?? 0;
+  const called = row?.called ?? 0;
+  return { day, taken, called, waiting: taken - called };
 }

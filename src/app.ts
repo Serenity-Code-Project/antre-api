@@ -3,7 +3,7 @@ import { timingSafeEqual } from 'node:crypto';
 import { OpenAPIHono, createRoute, z } from '@hono/zod-openapi';
 import { cors } from 'hono/cors';
 
-import { callNext, readState, takeNumber } from './queue.ts';
+import { callNext, readState, readStats, takeNumber } from './queue.ts';
 
 const TicketSchema = z
   .object({
@@ -55,6 +55,9 @@ const readStateRoute = createRoute({
 
 const ErrorSchema = z.object({ error: z.string() }).openapi('Error');
 
+/* Lets the staff routes work in local development without setting STAFF_KEY. */
+const DEV_STAFF_KEY = 'antre-dev-key';
+
 /* Staff call the next number. The key travels in a header and is never part of the code. */
 const callNextRoute = createRoute({
   method: 'post',
@@ -68,6 +71,27 @@ const callNextRoute = createRoute({
   },
 });
 
+const QueueStatsSchema = z
+  .object({
+    day: z.string(),
+    taken: z.number().int(),
+    called: z.number().int(),
+    waiting: z.number().int(),
+  })
+  .openapi('QueueStats');
+
+/* Staff read today's counts. Same staff key as calling the next number. */
+const readStatsRoute = createRoute({
+  method: 'get',
+  path: '/stats',
+  operationId: 'readStats',
+  security: [{ staffKey: [] }],
+  responses: {
+    200: { description: "Today's counts", content: { 'application/json': { schema: QueueStatsSchema } } },
+    401: { description: 'The staff key is missing or wrong', content: { 'application/json': { schema: ErrorSchema } } },
+  },
+});
+
 /** True only when a staff key is configured and the given key matches it. */
 function isStaff(given: string | undefined, staffKey: string | undefined): boolean {
   if (!staffKey || !given) return false;
@@ -78,7 +102,7 @@ function isStaff(given: string | undefined, staffKey: string | undefined): boole
 
 export const SPEC_INFO = { openapi: '3.1.0', info: { title: 'Antre API', version: '0.1.0' } };
 
-export function createApp(db: Database, webOrigin: string, staffKey?: string): OpenAPIHono {
+export function createApp(db: Database, webOrigin: string, staffKey: string = DEV_STAFF_KEY): OpenAPIHono {
   const app = new OpenAPIHono();
   app.use('*', cors({ origin: webOrigin }));
 
@@ -91,6 +115,10 @@ export function createApp(db: Database, webOrigin: string, staffKey?: string): O
     const ticket = callNext(db);
     if (!ticket) return c.json({ error: 'nobody is waiting' }, 409);
     return c.json(ticket, 200);
+  });
+  app.openapi(readStatsRoute, (c) => {
+    if (!isStaff(c.req.header('x-staff-key'), staffKey)) return c.json({ error: 'staff key required' }, 401);
+    return c.json(readStats(db), 200);
   });
   app.doc31('/openapi.json', SPEC_INFO);
 
