@@ -1,5 +1,6 @@
 import type { Database } from 'bun:sqlite';
 import { OpenAPIHono, createRoute, z } from '@hono/zod-openapi';
+import { Scalar } from '@scalar/hono-api-reference';
 import { cors } from 'hono/cors';
 
 import { readState, takeNumber } from './queue.ts';
@@ -62,6 +63,8 @@ export function createApp(db: Database, webOrigin: string): OpenAPIHono {
   app.openapi(takeNumberRoute, (c) => c.json(takeNumber(db), 201));
   app.openapi(readStateRoute, (c) => c.json(readState(db), 200));
   app.doc31('/openapi.json', SPEC_INFO);
+  /* The reference page is not part of the API, so it is a plain route and stays out of the spec. */
+  app.get('/docs', Scalar({ url: '/openapi.json' }));
 
   return app;
 }
