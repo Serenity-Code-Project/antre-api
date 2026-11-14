@@ -27,14 +27,16 @@ agen keluar dari batas.
 
 ```sh
 bun test            # 5 pass, 0 fail
-bun run type-check  # tidak mencetak apa pun
+bun run type-check  # hanya mencetak $ tsc --noEmit
 git diff main --stat
 ```
 
 ### Yang Perlu Diperhatikan
 
-- Skema dan handler berubah bersama. Kalau hanya handler yang diubah, `type-check` gagal karena
-  jawaban tidak cocok dengan skema. Itu contoh pemeriksaan yang menangkap kesalahan sebelum kamu.
+- Skema dan handler berubah bersama. Kalau hanya skemanya yang diubah, `type-check` gagal dengan
+  `Property 'service' is missing`. Kalau hanya handler yang diubah, `type-check` dan tes tetap
+  lolos, dan yang menangkapnya adalah `openapi.json` yang tidak memuat `service`, karena ekspor
+  membaca skema, bukan handler. Itu contoh pemeriksaan yang menangkap kesalahan sebelum kamu.
 - Tes baru memeriksa isi jawaban dengan `toEqual`, bukan sekadar status 200. Tes yang hanya
   memeriksa status tetap lolos kalau field `service` salah isi.
 - `openapi.json` berubah karena perintah ekspor, dan perubahannya ikut di-commit. Kontrak yang
